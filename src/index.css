@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cfcfcf transparent;
+}
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cfcfcf;
+  border-radius: 999px;
+}
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 @font-face {
   font-family: "Geologica";
   src: url("./fonts/Geologica/Geologica-VariableFont_CRSV,SHRP,slnt,wght.ttf") format("truetype-variations");

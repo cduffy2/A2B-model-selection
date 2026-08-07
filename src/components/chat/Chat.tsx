@@ -14,8 +14,74 @@ interface Message {
   content: string;
 }
 
+const GREETING_RE = /^(hi|hey|hello|yo|sup|good (morning|afternoon|evening))\b/i;
+const THANKS_RE = /\b(thanks|thank you|cheers|appreciate it)\b/i;
+const HOW_ARE_YOU_RE = /how('s| is| are)? (it going|you doing|you|things)/i;
+
+function pick(options: string[], seed: string): string {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  return options[hash % options.length];
+}
+
 function reply(userText: string): string {
-  return `You said: "${userText}". This is a prototype response — no backend is wired up yet.`;
+  const text = userText.trim();
+  const lower = text.toLowerCase();
+
+  if (GREETING_RE.test(lower)) {
+    return pick(
+      [
+        "Hey! What are you working on today?",
+        "Hi there — what can I help you figure out?",
+        "Hello! What's on your mind?",
+      ],
+      text,
+    );
+  }
+
+  if (HOW_ARE_YOU_RE.test(lower)) {
+    return pick(
+      [
+        "Running smoothly, thanks for asking. What can I help with?",
+        "All good on my end — what are you looking to do?",
+      ],
+      text,
+    );
+  }
+
+  if (THANKS_RE.test(lower)) {
+    return pick(["Anytime!", "Happy to help.", "Of course — let me know if anything else comes up."], text);
+  }
+
+  if (text.endsWith("?")) {
+    return pick(
+      [
+        `Good question. Based on "${text}", here's a quick take: it depends on the specifics, but the short version is it's usually worth testing a couple of approaches before committing.`,
+        `That's a fair thing to ask. On "${text}" — I'd start simple, see what breaks, then iterate from there.`,
+        `Let me think through that. For "${text}", the main trade-off is speed versus reliability — most teams lean toward reliability first.`,
+      ],
+      text,
+    );
+  }
+
+  if (text.split(/\s+/).length <= 3) {
+    return pick(
+      [
+        `Got it — "${text}". Want me to expand on that or take a specific angle?`,
+        `Noted: "${text}". Anything specific you'd like me to focus on?`,
+      ],
+      text,
+    );
+  }
+
+  return pick(
+    [
+      `Here's how I'd think about it: "${text.slice(0, 60)}${text.length > 60 ? "…" : ""}" breaks down into a few parts. The core idea seems solid — the main thing I'd flag is making sure the details hold up once you dig in.`,
+      `Interesting — reading through what you sent, the key point seems to be around ${lower.split(/\s+/).slice(0, 4).join(" ")}. I'd suggest breaking it into smaller steps and validating each one.`,
+      `Thanks for the context. Based on that, I'd approach it in stages: clarify the goal, sketch a rough plan, then refine as you learn more.`,
+    ],
+    text,
+  );
 }
 
 export function Chat() {
@@ -31,14 +97,24 @@ export function Chat() {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
 
+    const fullReply = reply(text);
+    const assistantId = crypto.randomUUID();
+    const thinkingDelay = 400 + Math.random() * 500;
+
     window.setTimeout(() => {
-      const assistantMessage: Message = {
-        id: crypto.randomUUID(),
-        role: "assistant",
-        content: reply(text),
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-    }, 400);
+      setMessages((prev) => [...prev, { id: assistantId, role: "assistant", content: "" }]);
+
+      const words = fullReply.split(" ");
+      let count = 0;
+      const stream = window.setInterval(() => {
+        count += 1;
+        const partial = words.slice(0, count).join(" ");
+        setMessages((prev) =>
+          prev.map((m) => (m.id === assistantId ? { ...m, content: partial } : m)),
+        );
+        if (count >= words.length) window.clearInterval(stream);
+      }, 35);
+    }, thinkingDelay);
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -160,6 +236,8 @@ const SPECIFIC_MODELS = [
   { name: "Qwen 3.6 27B", description: "Coding and vision", price: "€€" },
   { name: "Mistral Small 4", description: "Fast, everyday tasks", price: "€" },
   { name: "DeepSeek V4 Flash", description: "Fast coding tasks", price: "€€€" },
+  { name: "Llama 5 90B", description: "General purpose reasoning", price: "€€" },
+  { name: "Command R2", description: "Retrieval and long context", price: "€€€" },
 ];
 
 function ModelSelect() {
@@ -268,7 +346,7 @@ function ModelSelect() {
                 </div>
                 <div className="flex w-full items-start justify-between gap-2">
                   <span className="text-[12px] leading-[18px] text-[#737373]">
-                    6 models · usually more energy than Auto
+                    7 models · usually more energy than Auto
                   </span>
                   <span className="shrink-0 text-[14px] font-semibold leading-[18px] text-[#2c796b]">
                     €€
@@ -281,32 +359,34 @@ function ModelSelect() {
               <button
                 type="button"
                 onClick={() => setView("root")}
-                className="flex w-full items-center gap-1 border-b border-[rgba(61,61,61,0.2)] bg-white px-3 py-1 text-left hover:bg-[#f2f2f2]"
+                className="flex w-full items-center gap-1 border-b border-[rgba(61,61,61,0.2)] bg-white py-1 pl-2 pr-3 text-left hover:bg-[#f2f2f2]"
               >
                 <ChevronLeft className="size-4 text-[#3d3d3d]" />
                 <span className="text-[14px] font-semibold leading-[18px] text-[#3d3d3d]">Back</span>
               </button>
 
-              {SPECIFIC_MODELS.map((m) => (
-                <button
-                  key={m.name}
-                  type="button"
-                  onClick={() => selectModel(m.name)}
-                  className="flex w-full flex-col items-start gap-1 border-b border-[#ebebeb] bg-white px-3 py-1 text-left hover:bg-[#f2f2f2]"
-                >
-                  <span className="w-full text-[14px] font-semibold leading-[18px] text-[#3d3d3d]">
-                    {m.name}
-                  </span>
-                  <div className="flex w-full items-start justify-between gap-2">
-                    <span className="text-[12px] leading-[18px] text-[#737373]">
-                      {m.description}
+              <div className="thin-scrollbar max-h-[270px] w-full overflow-y-auto">
+                {SPECIFIC_MODELS.map((m) => (
+                  <button
+                    key={m.name}
+                    type="button"
+                    onClick={() => selectModel(m.name)}
+                    className="flex w-full flex-col items-start gap-1 border-b border-[#ebebeb] bg-white px-3 py-1 text-left hover:bg-[#f2f2f2]"
+                  >
+                    <span className="w-full text-[14px] font-semibold leading-[18px] text-[#3d3d3d]">
+                      {m.name}
                     </span>
-                    <span className="shrink-0 text-[14px] font-semibold leading-[18px] text-[#2c796b]">
-                      {m.price}
-                    </span>
-                  </div>
-                </button>
-              ))}
+                    <div className="flex w-full items-start justify-between gap-2">
+                      <span className="text-[12px] leading-[18px] text-[#737373]">
+                        {m.description}
+                      </span>
+                      <span className="shrink-0 text-[14px] font-semibold leading-[18px] text-[#2c796b]">
+                        {m.price}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </>
           )}
 
