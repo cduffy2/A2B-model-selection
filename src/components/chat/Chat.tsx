@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, Check, ChevronDown, ChevronLeft, ChevronRight, Leaf } from "lucide-react";
+import { ArrowUp, ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import paperclipIcon from "@/assets/Paperclip.png";
@@ -7,6 +7,16 @@ import magicWandIcon from "@/assets/MagicWand.png";
 import microphoneIcon from "@/assets/Microphone.png";
 import shieldCheckIcon from "@/assets/ShieldCheck.png";
 import cpuIcon from "@/assets/Model selection/Cpu.png";
+import vectorIcon from "@/assets/Model selection/Menu item/Vector.svg";
+import checkIcon from "@/assets/Model selection/Menu item/Check.svg";
+import leafIcon from "@/assets/Model selection/Menu item/Leaf.svg";
+import brainIcon from "@/assets/Model selection/Menu item/Brain.svg";
+import caretRightIcon from "@/assets/Model selection/Menu item/CaretRight.svg";
+import caretLeftIcon from "@/assets/Model selection/Menu item/CaretLeft.svg";
+import glmLogo from "@/assets/GLM.svg";
+import qwenLogo from "@/assets/Qwen.svg";
+import mistralLogo from "@/assets/Mistral.svg";
+import deepseekLogo from "@/assets/Deepseek.svg";
 
 interface Message {
   id: string;
@@ -231,19 +241,18 @@ function ChatInput({
 }
 
 const SPECIFIC_MODELS = [
-  { name: "GLM 5.2", description: "Complex reasoning and coding", price: "€€" },
-  { name: "GLM 5.1", description: "Writing and coding", price: "€€€" },
-  { name: "Qwen 3.6 27B", description: "Coding and vision", price: "€€" },
-  { name: "Mistral Small 4", description: "Fast, everyday tasks", price: "€" },
-  { name: "DeepSeek V4 Flash", description: "Fast coding tasks", price: "€€€" },
-  { name: "Llama 5 90B", description: "General purpose reasoning", price: "€€" },
-  { name: "Command R2", description: "Retrieval and long context", price: "€€€" },
+  { name: "GLM 5.2", description: "Complex reasoning and coding", price: "€€", logo: glmLogo },
+  { name: "GLM 5.1", description: "Writing and coding", price: "€€€", logo: glmLogo },
+  { name: "Qwen 3.6 27B", description: "Coding and vision", price: "€€", logo: qwenLogo },
+  { name: "Mistral Small 4", description: "Fast, everyday tasks", price: "€", logo: mistralLogo },
+  { name: "DeepSeek V4 Flash", description: "Fast coding tasks", price: "€€€", logo: deepseekLogo },
+  { name: "DeepSeek V4Pro", description: "Advanced reasoning tasks", price: "€€€", logo: deepseekLogo },
 ];
 
 function ModelSelect() {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<"root" | "specific">("root");
-  const [model, setModel] = useState("Auto");
+  const [model, setModel] = useState("Balance");
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -288,99 +297,203 @@ function ModelSelect() {
         >
           {view === "root" ? (
             <>
-              <button
-                type="button"
-                onClick={() => selectModel("Auto")}
-                className="flex w-full flex-col items-start gap-1 bg-[#daf1ed] p-2 text-left hover:bg-[#cdeae4]"
-              >
-                <div className="flex w-full items-center justify-between">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-[14px] font-semibold leading-[18px] text-[#3d3d3d]">
-                      Auto
-                    </span>
-                    <span className="text-[11px] leading-[15px] text-[#737373]">Recommended</span>
-                  </div>
-                  <span className="flex size-4 items-center justify-center rounded-full bg-[#2c796b]">
-                    <Check className="size-3 text-white" />
-                  </span>
-                </div>
-                <p className="text-[12px] leading-[18px] text-[#737373]">
-                  Fuses the world's leading open-source models, picking the best one for each
-                  prompt, saving energy and money in the process.
-                </p>
-                <div className="flex items-center gap-1">
-                  {["Gemma 4", "GLM 5", "Kimi K3"].map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-[rgba(28,76,66,0.2)] bg-white px-2.5 py-0.5 text-[12px] leading-none text-[#1c4c42]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex w-full items-center justify-between">
-                  <div className="flex items-center gap-[5px]">
-                    <Leaf className="size-4 text-[#2c796b]" />
-                    <span className="text-[11px] font-semibold leading-[15px] text-[#2c796b]">
-                      Lowest energy
-                    </span>
-                    <span className="text-[14px] font-semibold leading-[18px] text-[#2c796b]">·</span>
-                    <span className="text-[11px] font-semibold leading-[15px] text-[#2c796b]">
-                      Just as capable
-                    </span>
-                  </div>
-                  <span className="text-[14px] font-semibold leading-[18px] text-[#2c796b]">€</span>
-                </div>
-              </button>
+              <div className="flex w-full items-center gap-2 bg-white py-2 pl-2 pr-3">
+                <img src={vectorIcon} alt="" className="size-4" />
+                <span className="text-[14px] font-semibold leading-[22px] text-[#3d3d3d]">
+                  Aim2Balance models
+                </span>
+              </div>
 
-              <button
-                type="button"
-                onClick={() => setView("specific")}
-                className="flex w-full flex-col items-start gap-1 border-b border-[#ebebeb] bg-white px-3 py-1 text-left hover:bg-[#f2f2f2]"
-              >
-                <div className="flex w-full items-center justify-between">
-                  <span className="text-[14px] font-semibold leading-[18px] text-[#3d3d3d]">
-                    Choose a specific model
-                  </span>
-                  <ChevronRight className="size-4 text-[#3d3d3d]" />
-                </div>
-                <div className="flex w-full items-start justify-between gap-2">
-                  <span className="text-[12px] leading-[18px] text-[#737373]">
-                    7 models · usually more energy than Auto
-                  </span>
-                  <span className="shrink-0 text-[14px] font-semibold leading-[18px] text-[#2c796b]">
-                    €€
-                  </span>
-                </div>
-              </button>
+              <div className="flex w-full flex-col gap-2 px-2 pb-2">
+                <button
+                  type="button"
+                  onClick={() => selectModel("Balance")}
+                  className={cn(
+                    "flex w-full flex-col gap-2 rounded px-3 py-2 text-left",
+                    model === "Balance"
+                      ? "border-2 border-[#2c796b] bg-[#ebebeb]"
+                      : "border border-[#ebebeb] bg-white hover:bg-[#f2f2f2]",
+                  )}
+                >
+                  <div className="flex w-full flex-col gap-1">
+                    <div className="flex w-full items-center justify-between">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-[14px] font-semibold leading-[22px] text-[#3d3d3d]">
+                          Balance
+                        </span>
+                        <span className="text-[11px] leading-[15px] text-[#737373]">
+                          · Mid sized
+                        </span>
+                      </div>
+                      {model === "Balance" && (
+                        <span className="flex size-4 items-center justify-center rounded-full bg-[#2c796b]">
+                          <img src={checkIcon} alt="" className="size-3" />
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex w-full items-center gap-2">
+                      {["Gemma 4", "GLM 5", "Kimi K3"].map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full border border-[#a6a6a6] bg-white px-2.5 py-0.5 text-[11px] leading-[15px] text-[#3d3d3d]"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex w-full flex-col gap-1">
+                    <div
+                      className={cn(
+                        "h-px w-full",
+                        model === "Balance" ? "bg-[#a6a6a6]" : "bg-[#ebebeb]",
+                      )}
+                    />
+                    <div className="flex w-full items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <img src={leafIcon} alt="" className="size-4" />
+                        <span className="text-[11px] font-semibold leading-[15px] text-[#2c796b]">
+                          Lowest energy
+                        </span>
+                      </div>
+                      <span className="text-[14px] font-semibold leading-[22px] text-[#737373]">
+                        €
+                      </span>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => selectModel("Performance")}
+                  className={cn(
+                    "flex w-full flex-col gap-2 rounded px-3 py-2 text-left",
+                    model === "Performance"
+                      ? "border-2 border-[#2c796b] bg-[#ebebeb]"
+                      : "border border-[#ebebeb] bg-white hover:bg-[#f2f2f2]",
+                  )}
+                >
+                  <div className="flex w-full items-center justify-between">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-[14px] font-semibold leading-[22px] text-[#3d3d3d]">
+                        Performance
+                      </span>
+                      <span className="text-[11px] leading-[15px] text-[#737373]">
+                        · Large sized
+                      </span>
+                    </div>
+                    {model === "Performance" && (
+                      <span className="flex size-4 items-center justify-center rounded-full bg-[#2c796b]">
+                        <img src={checkIcon} alt="" className="size-3" />
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex w-full items-center gap-1">
+                    {["DeepSeek V4Pro", "MiniMax M3", "Kimi K3"].map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full border border-[#a6a6a6] bg-white px-2.5 py-0.5 text-[11px] leading-[15px] text-[#3d3d3d]"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <div
+                    className={cn(
+                      "h-px w-full",
+                      model === "Performance" ? "bg-[#a6a6a6]" : "bg-[#ebebeb]",
+                    )}
+                  />
+                  <div className="flex w-full items-center justify-between">
+                    <div className="flex items-center gap-[5px]">
+                      <img src={brainIcon} alt="" className="size-4" />
+                      <span className="text-[11px] font-semibold leading-[15px] text-[#737373]">
+                        Highest intelligence
+                      </span>
+                    </div>
+                    <span className="text-[14px] font-semibold leading-[22px] text-[#737373]">
+                      €€
+                    </span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setView("specific")}
+                  className="flex w-full flex-col gap-1 rounded border border-[#ebebeb] bg-white px-3 py-2 text-left hover:bg-[#f2f2f2]"
+                >
+                  <div className="flex w-full items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[14px] font-semibold leading-[22px] text-[#3d3d3d]">
+                        Choose a specific model
+                      </span>
+                      <div className="flex items-center">
+                        {[
+                          { logo: mistralLogo, border: "#e10500" },
+                          { logo: glmLogo, border: "#3859ff" },
+                          { logo: qwenLogo, border: "#443eb0" },
+                          { logo: deepseekLogo, border: "#4d6bfe" },
+                        ].map((item, i) => (
+                          <span
+                            key={i}
+                            className="-mr-1 flex size-5 items-center justify-center rounded-full border bg-white"
+                            style={{ borderColor: item.border }}
+                          >
+                            <img src={item.logo} alt="" className="size-4" />
+                          </span>
+                        ))}
+                        <span className="-mr-1 flex size-5 items-center justify-center rounded-full border border-[#737373] bg-white">
+                          <span className="text-[10px] font-semibold leading-[18px] text-[#3d3d3d]">
+                            +2
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                    <img src={caretRightIcon} alt="" className="size-4" />
+                  </div>
+                  <div className="flex w-full items-center justify-between">
+                    <span className="text-[13px] leading-[18px] text-[#737373]">
+                      6 models, usually more energy
+                    </span>
+                    <span className="text-[13px] font-semibold leading-[18px] text-[#737373]">
+                      €€
+                    </span>
+                  </div>
+                </button>
+              </div>
             </>
           ) : (
             <>
               <button
                 type="button"
                 onClick={() => setView("root")}
-                className="flex w-full items-center gap-1 border-b border-[rgba(61,61,61,0.2)] bg-white py-1 pl-2 pr-3 text-left hover:bg-[#f2f2f2]"
+                className="flex w-full items-center gap-2 bg-white py-2 pl-2 pr-3 text-left hover:bg-[#f2f2f2]"
               >
-                <ChevronLeft className="size-4 text-[#3d3d3d]" />
-                <span className="text-[14px] font-semibold leading-[18px] text-[#3d3d3d]">Back</span>
+                <img src={caretLeftIcon} alt="" className="size-3" />
+                <span className="text-[14px] font-semibold leading-[22px] text-[#3d3d3d]">
+                  Back to Aim2Balance models
+                </span>
               </button>
 
-              <div className="thin-scrollbar max-h-[270px] w-full overflow-y-auto">
+              <div className="thin-scrollbar flex h-[300px] w-full flex-col gap-1 overflow-y-auto px-2 pb-2">
                 {SPECIFIC_MODELS.map((m) => (
                   <button
                     key={m.name}
                     type="button"
                     onClick={() => selectModel(m.name)}
-                    className="flex w-full flex-col items-start gap-1 border-b border-[#ebebeb] bg-white px-3 py-1 text-left hover:bg-[#f2f2f2]"
+                    className="flex w-full shrink-0 flex-col gap-1 rounded border border-[#ebebeb] bg-white px-3 py-2 text-left hover:bg-[#f2f2f2]"
                   >
-                    <span className="w-full text-[14px] font-semibold leading-[18px] text-[#3d3d3d]">
-                      {m.name}
-                    </span>
-                    <div className="flex w-full items-start justify-between gap-2">
-                      <span className="text-[12px] leading-[18px] text-[#737373]">
+                    <div className="flex w-full items-center gap-2">
+                      <img src={m.logo} alt="" className="size-6" />
+                      <span className="flex-1 text-[14px] font-semibold leading-[22px] text-[#3d3d3d]">
+                        {m.name}
+                      </span>
+                    </div>
+                    <div className="flex w-full items-center justify-between pl-8">
+                      <span className="text-[13px] leading-[18px] text-[#737373]">
                         {m.description}
                       </span>
-                      <span className="shrink-0 text-[14px] font-semibold leading-[18px] text-[#2c796b]">
+                      <span className="text-[14px] font-semibold leading-[22px] text-[#737373]">
                         {m.price}
                       </span>
                     </div>
