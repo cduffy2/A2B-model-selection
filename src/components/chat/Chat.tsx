@@ -436,14 +436,14 @@ function ModelSelect() {
                         ].map((item, i) => (
                           <span
                             key={i}
-                            className="-mr-1 flex size-5 items-center justify-center rounded-full border bg-white"
+                            className="-mr-1.5 flex size-6 items-center justify-center overflow-hidden rounded-full border bg-white"
                             style={{ borderColor: item.border }}
                           >
-                            <img src={item.logo} alt="" className="size-4" />
+                            <img src={item.logo} alt="" className="size-[18px]" />
                           </span>
                         ))}
-                        <span className="-mr-1 flex size-5 items-center justify-center rounded-full border border-[#737373] bg-white">
-                          <span className="text-[10px] font-semibold leading-[18px] text-[#3d3d3d]">
+                        <span className="-mr-1.5 flex size-6 items-center justify-center rounded-full border border-[#737373] bg-white">
+                          <span className="text-[11px] font-semibold leading-[18px] text-[#3d3d3d]">
                             +2
                           </span>
                         </span>
